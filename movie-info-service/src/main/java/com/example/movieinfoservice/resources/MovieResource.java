@@ -3,6 +3,7 @@ package com.example.movieinfoservice.resources;
 import com.example.movieinfoservice.models.Movie;
 import com.example.movieinfoservice.models.MovieSummary;
 // import com.example.movieinfoservice.utils.Logger;
+import com.mongodb.MongoWriteException;
 
 import java.util.Optional;
 
@@ -44,7 +45,11 @@ public class MovieResource {
         MovieSummary movieSummary = restTemplate.getForObject(url, MovieSummary.class);
         // Cache the movie info
         Movie newMovie = new Movie(movieId, movieSummary.getTitle(), movieSummary.getOverview());
-        movieCache.addMovie(newMovie);
+        try {
+            movieCache.addMovie(newMovie);
+        } catch (MongoWriteException e) {
+            System.out.println("Movie already exists, skipping insertion.");
+        }
 
         return newMovie;
     }

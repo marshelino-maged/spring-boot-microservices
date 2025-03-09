@@ -1,6 +1,8 @@
 package com.example.movieinfoservice.resources;
 
 import com.example.movieinfoservice.models.Movie;
+import com.mongodb.MongoWriteException;
+import com.example.movieinfoservice.utils.Logger;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -31,7 +33,7 @@ public class MovieCache {
         // System.out.println("Cache created");
     }
 
-    public void addMovie(Movie movie) {
+    public void addMovie(Movie movie) throws com.mongodb.MongoWriteException {
         if (currentCacheSize >= maxCacheSize) {
             List<Document> oldestMovies = collection.find()
                     .sort(Sorts.ascending("cachedAt"))
@@ -44,11 +46,17 @@ public class MovieCache {
             currentCacheSize -= oldestMovies.size();
         }
         
-        currentCacheSize++;
-        Document document = new Document("_id", movie.getMovieId())
+        try {
+            Document document = new Document("_id", movie.getMovieId())
                 .append("name", movie.getName()).append("description", movie.getDescription())
                 .append("cachedAt", new java.util.Date());
-        collection.insertOne(document);
+            
+                collection.insertOne(document);
+            currentCacheSize++;
+        } catch (MongoWriteException e) {
+            Logger.red("Movie already exists, skipping insertion.");
+        }
+        
     }
 
     public Optional<Movie> getMovie(String movieId) {
