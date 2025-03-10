@@ -1,5 +1,6 @@
 package com.moviecatalogservice.services;
 
+import com.moviecatalogservice.models.CatalogItem;
 import com.moviecatalogservice.models.Movie;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,13 @@ public class TopMoviesService {
     @GrpcClient("trending-movies-service")
     private TrendingMoviesServiceGrpc.TrendingMoviesServiceBlockingStub trendingMoviesStub;
 
-    public List<Movie> getTrendingMovies(int limit) {
-        TrendingMoviesRequest request = TrendingMoviesRequest.newBuilder().setLimit(limit).build();
+    public List<CatalogItem> getTrendingMovies() {
+        TrendingMoviesRequest request = TrendingMoviesRequest.newBuilder().build();
 
         TrendingMoviesResponse response = trendingMoviesStub.getTrendingMovies(request);
 
         return response.getMoviesList().stream()
-                .map(movie -> new Movie(movie.getId(), movie.getName(), movie.getDescription()))
+                .map(movie -> new CatalogItem(movie.getName(), movie.getDescription(), movie.getRating()))
                 .collect(Collectors.toList());
     }
 }

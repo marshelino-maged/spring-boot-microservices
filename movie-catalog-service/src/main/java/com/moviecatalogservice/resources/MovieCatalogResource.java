@@ -53,7 +53,7 @@ public class MovieCatalogResource {
     }
 
     @GetMapping("/trending")
-    public List<Movie> getTrendingMovies(@RequestParam(defaultValue = "5") int limit) {
-        return topMoviesService.getTrendingMovies(limit);
+    public List<CatalogItem> getTrendingMovies() {
+        return topMoviesService.getTrendingMovies();
     }
 }
