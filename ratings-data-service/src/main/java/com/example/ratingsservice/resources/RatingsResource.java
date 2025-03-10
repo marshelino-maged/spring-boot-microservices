@@ -16,6 +16,6 @@ public class RatingsResource {
 
     @RequestMapping("/{userId}")
     public UserRating getRatingsOfUser(@PathVariable String userId) {
-        return new UserRating(ratingRepository.findById_UserId(Integer.parseInt(userId)));
+        return new UserRating(ratingRepository.findByUserId(userId));
     }
 }
